@@ -26,9 +26,9 @@ class Spool:
         self.vel = 0
         self.angvel = 0
         self.mass = mass
-        self.scalefactor = 10
+        self.scalefactor = 4
         self.paused = True
-        self.initialstringlength = 5*self.minor*2*PI
+        self.initialstringlength = 6*self.minor*2*PI
         self.stringlength = self.initialstringlength
 
     def draw(self):
@@ -45,8 +45,10 @@ class Spool:
             ellipse(0, 0, drawmajor*2, drawmajor*2)
             ellipse(0, 0, drawminor*2, drawminor*2)
 
-        ellipse(drawmajor, 0, 10, 10)
-        ellipse(-1*drawmajor, 0, 10, 10)
+        ellipse(drawmajor, 0, self.scalefactor, self.scalefactor)
+        ellipse(drawminor, 0, self.scalefactor, self.scalefactor)
+        ellipse(-1*drawmajor, 0, self.scalefactor, self.scalefactor)
+        ellipse(-1*drawminor, 0, self.scalefactor, self.scalefactor)
 
         popMatrix()
         pushMatrix()
@@ -69,13 +71,13 @@ class Spool:
         self.angle = angle
 
     def incrementAngle(self, increment):
-        self.angle += increment
-        self.stringlength -= increment*self.minor
+        self.angle -= increment
+        self.stringlength += increment*self.minor
         
         if self.stringlength < 3:
             self.paused = True
 
-        print self.stringlength
+        #print self.stringlength
             
         
 
@@ -126,7 +128,7 @@ def setup():
     global minor
     minor = 2.0
     global force
-    force = 5.0
+    force = 20.0
 
     global resetButton
     resetButton = Button(width/2 - 50, height-50, "Reset")
@@ -230,21 +232,22 @@ def calc(spool, major, minor, pull):
     alpha = (major*friction+minor*pull)/inertia
 
     #print "alpha is %f" % alpha
-    #print 'a is %f', a
+    #print 'a is %f' % a
 
     # Calculate Position increments Using Basic Kinematics
     dt = 1.0/50 # a time step is one frame
     dx = 1.0/2.0*a*dt**2.0+spool.vel*dt
-    dtheta = dx/major # 1.0/2.0*alpha*dt**2.0+spool.angvel*dt
+    dtheta = 1.0/2.0*alpha*dt**2.0+spool.angvel*dt
 
     #print "x moved by: %f, angle moved by %f" % (dx, dtheta)
     
-    # Check if spool is paused
     # Increment Spool Positions
     spool.incrementPosition(dx, 0)
     spool.incrementAngle(dtheta)
+
+    # Increment the Spool's Velocity
     spool.vel += a*dt
-    spool.angvel += a*dt
+    spool.angvel += alpha*dt
 
 if __name__== "__main__":
     run()
