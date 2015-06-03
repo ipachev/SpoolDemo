@@ -9,6 +9,15 @@
         </style>
     </head>
     <body>
+    	<button type="button" onclick="spool.resetPosition()">Reset Spool</button>
+    	<button type="button" onclick="spool.pause()">Pause/Unpause Spool</button>
+    	<form id="inputs" action="form_action.asp">
+			Pull Force: <input type="text" name="pullforce" value="">
+			Major Axis: <input type="text" name="majoraxis" value="">
+			Minor Axis: <input type="text" name="minoraxis" value="">
+			Mass: <input type="text" name="mass" value="">
+		</form> 
+		<button type="button" onclick="applyValues()">Apply</button>
         <canvas id="myCanvas" width="1900" height="800"></canvas>
         <script>
             window.requestAnimFrame = (function(callback) {
@@ -17,6 +26,7 @@
                     window.setTimeout(callback, 1000 / 60);
                 };
             })();
+
 
             function Table(height) {
                 this.height = height;
@@ -45,6 +55,7 @@
 
                 this.setMinor = function(minor) {
                     this.minor = minor;
+                    console.log("changed minor axis to " + minor);
                 };
 
                 this.setMajor = function(major) {
@@ -52,11 +63,17 @@
                     if(this.table != null) {
                         this.setOnTable(this.table);
                     }
+                    console.log("changed major axis to " + major);
+                };
+
+                this.setMass = function(mass) {
+                	this.mass = mass;
+                	console.log("changed mass to " + mass);
                 };
 
                 this.setOnTable = function(table, canvas) {
                     this.table = table;
-                    this.y = table.height-this.major*this.scalefactor;
+                    this.y = this.initialy = table.height-this.major*this.scalefactor;
                 };
 
                 this.incrementAngle = function(increment) {
@@ -111,7 +128,7 @@
                     var drawmajor = this.major*this.scalefactor;
                     var drawminor = this.minor*this.scalefactor;
                     context.fillStyle = "#DEB887";
-                    context.strokeStyle = "#FFFFFF"
+                    context.strokeStyle = "#000000"
                     context.translate(this.x, this.y);
                     context.rotate(this.angle);
 
@@ -159,32 +176,55 @@
                 };
             }
 
-            function animate(canvas, context, spool, table, pull)
+            var pullForce;
+            var canvas = document.getElementById('myCanvas');
+            var context = canvas.getContext('2d');
+
+            var spool = new Spool(100, 300, 5.0, 10.0, 10.0);
+            var table = new Table(canvas.height-400);
+
+            function animate(canvas, context)
             {
                 if(!spool.paused)
                 {
-                    spool.calc(pull);
+                    spool.calc(pullForce);
                 }
                 context.clearRect(0,0, canvas.width, canvas.height);
                 spool.draw(context);
                 table.draw(context, canvas);
                 requestAnimFrame(function () {
-                    animate(canvas, context, spool, table, pull);
+                    animate(canvas, context);
                 })
             }
 
-            var canvas = document.getElementById('myCanvas');
-            var context = canvas.getContext('2d');
 
-            var spool = new Spool(100, 300, 5.0, 10.0, 5.0);
-            var table = new Table(canvas.height-400);
+            
+            function applyValues() {
+            	var input = document.getElementById("inputs");
+            	pullForce = parseFloat(input.pullforce.value);
+            	spool.setMajor(parseFloat(input.majoraxis.value));
+            	spool.setMinor(parseFloat(input.minoraxis.value));
+            	spool.setMass(parseFloat(input.mass.value));
+            	spool.resetPosition();
+            }
+
+            function init() {
+            	var input = document.getElementById("inputs");
+            	input.pullforce.value = 20;
+            	input.majoraxis.value = 10.0;
+            	input.minoraxis.value = 5.0;
+            	input.mass.value = 5.0;
+            	applyValues();
+            }
+
+            init()
 
             spool.setOnTable(table);
             spool.draw(context);
             table.draw(context, canvas);
 
 
-            animate(canvas, context, spool, table, 20);
+            animate(canvas, context, spool, table);
 
         </script>
     </body>
