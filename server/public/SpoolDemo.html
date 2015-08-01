@@ -1,0 +1,25 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <style>
+            body {
+                margin: 0px;
+                padding: 0px;
+            }
+        </style>
+    </head>
+    <body>
+    	<button type="button" onclick="spool.resetPosition()">Reset Spool</button>
+    	<button type="button" onclick="spool.pause()">Pause/Unpause Spool</button>
+    	<form id="inputs" action="form_action.asp">
+			Pull Force: <input type="text" name="pullforce" value="">
+			Major Axis: <input type="text" name="majoraxis" value="">
+			Minor Axis: <input type="text" name="minoraxis" value="">
+			Mass: <input type="text" name="mass" value="">
+		</form> 
+		<button type="button" onclick="applyValues()">Apply</button>
+        <canvas id="myCanvas" width="1900" height="800"></canvas>
+        <script src="https://cdn.socket.io/socket.io-1.3.5.js"></script>
+        <script type="text/javascript" src="SpoolDemo.js"></script>
+    </body>
+</html>      
