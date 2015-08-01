@@ -168,8 +168,8 @@ function animate(canvas, context)
         spool.calc(pullForce);
     }
     context.clearRect(0,0, canvas.width, canvas.height);
-    spool.draw(context);
     table.draw(context, canvas);
+    spool.draw(context);
     requestAnimFrame(function () {
         animate(canvas, context);
     })
